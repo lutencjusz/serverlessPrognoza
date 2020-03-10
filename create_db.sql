@@ -1,3 +1,5 @@
+CREATE DATABASE DBPrognozaPodlewania
+USE DBPrognozaPodlewania
 CREATE TABLE `prognozaWeatherbit` (
   `timestamp` timestamp NULL DEFAULT NULL,
   `data` timestamp NULL DEFAULT NULL,
