@@ -120,7 +120,7 @@ Resources:
       CodeUri: functions/prognoza-podlewania-obslugaDatyCzasu.zip
       Description: ''
       MemorySize: 128
-      Timeout: 3
+      Timeout: 6
       Role: !Ref RoleID
 
   prognozapodlewaniapobierzICMdoPrognozy:
@@ -131,7 +131,7 @@ Resources:
       CodeUri: functions/prognoza-podlewania-pobierzICMdoPrognozy.zip
       Description: ''
       MemorySize: 128
-      Timeout: 3
+      Timeout: 6
       Role: !Ref RoleID
       Environment:
         Variables:
@@ -148,7 +148,7 @@ Resources:
       CodeUri: functions/prognoza-podlewania-POST-MySQL.zip
       Description: ''
       MemorySize: 128
-      Timeout: 2
+      Timeout: 8
       Role: !Ref RoleID
       Environment:
         Variables:
@@ -165,7 +165,7 @@ Resources:
       CodeUri: functions/prognoza-podlewania-tlumaczenieNaPL.zip
       Description: ''
       MemorySize: 128
-      Timeout: 3
+      Timeout: 6
       Role: !Ref RoleID
   prognozapodlewaniazapisDoBazy:
     Type: 'AWS::Serverless::Function'
@@ -175,7 +175,7 @@ Resources:
       CodeUri: functions/prognoza-podlewania-zapisDoBazy.zip
       Description: ''
       MemorySize: 128
-      Timeout: 1
+      Timeout: 8
       Role: !Ref RoleID
       Environment:
         Variables:
@@ -188,7 +188,7 @@ Resources:
       CodeUri: functions/prognoza-podlewania-czyWilgotnosc.zip
       Description: ''
       MemorySize: 128
-      Timeout: 3
+      Timeout: 8
       Role: !Ref RoleID
       Environment:
         Variables:
@@ -204,7 +204,7 @@ Resources:
       CodeUri: functions/prognoza-podlewania-pobierzArlyDoPrognozy.zip
       Description: ''
       MemorySize: 128
-      Timeout: 3
+      Timeout: 8
       Role: !Ref RoleID
       Environment:
         Variables:
@@ -220,7 +220,7 @@ Resources:
       CodeUri: functions/prognoza-podlewania-obslugaDatyCzasu.zip
       Description: ''
       MemorySize: 128
-      Timeout: 3
+      Timeout: 8
       Role: !Ref RoleID
   maszynaStanowaZapiszDoBazy:
     Type: AWS::StepFunctions::StateMachine

@@ -48,7 +48,7 @@ Resources:
       CodeUri: functions/prognoza-podlewania-pobierzDanePython.zip
       Description: ''
       MemorySize: 128
-      Timeout: 3
+      Timeout: 10
       Role: 'arn:aws:iam::790651879093:role/LambdaFullAccess'
       Events:
         Schedule1:
@@ -172,7 +172,7 @@ Resources:
       CodeUri: functions/prognoza-podlewania-pobierzDaneWeatherbit.zip
       Description: ''
       MemorySize: 128
-      Timeout: 6
+      Timeout: 8
       Role: !Ref RoleID
       Events:
         Schedule1:
