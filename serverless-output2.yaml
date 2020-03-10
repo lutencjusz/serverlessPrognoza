@@ -1,0 +1,157 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Parameters:
+  RoleID:
+    Description: Name of superuser of database
+    Type: String
+  apikeyICM:
+    NoEcho: true
+    Description: Apikey ICM
+    Type: String
+  apikeyAirly:
+    NoEcho: true
+    Description: Apikey Airly
+    Type: String
+  apikeyWeatherbit:
+    NoEcho: true
+    Description: Apikey Weatherbit
+    Type: String
+Resources:
+  prognozapodlewaniaorkiestracjaZapisuSQL:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: lambda_function.lambda_handler
+      Runtime: python3.6
+      CodeUri: s3://lutencjusz-sam/39d05b4eac04661330a594ffcd024926
+      Description: ''
+      MemorySize: 128
+      Timeout: 3
+      Role:
+        Ref: RoleID
+      Events:
+        SQS1:
+          Type: SQS
+          Properties:
+            Queue:
+              Fn::GetAtt:
+              - SQSQueue1
+              - Arn
+            BatchSize: 10
+      Environment:
+        Variables:
+          STEPFUNCTION_ARN:
+            Fn::ImportValue: maszynaStanowaZapiszDoBazy
+  SQSQueue1:
+    Type: AWS::SQS::Queue
+    Properties: {}
+  prognozapodlewaniauzupelnienieICM:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: lambda_function.lambda_handler
+      Runtime: python3.6
+      CodeUri: s3://lutencjusz-sam/7599e8320694c1381fbc875e3c4e012c
+      Description: ''
+      MemorySize: 128
+      Timeout: 20
+      Role:
+        Ref: RoleID
+      Environment:
+        Variables:
+          SQS_URL:
+            Ref: SQSQueue1
+          apikey:
+            Ref: apikeyICM
+  prognozapodlewaniapobierzDaneICM:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: lambda_function.lambda_handler
+      Runtime: python3.6
+      CodeUri: s3://lutencjusz-sam/83f4d0101c8f2666a44e784309949f72
+      Description: ''
+      MemorySize: 128
+      Timeout: 8
+      Role:
+        Ref: RoleID
+      Events:
+        Schedule1:
+          Type: Schedule
+          Properties:
+            Schedule: cron(1 12 * * ? *)
+      Environment:
+        Variables:
+          SQS_URL:
+            Ref: SQSQueue2
+          apikey:
+            Ref: apikeyICM
+          jednostka: C
+  prognozapodlewanieorkiestracjaSQSPython:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: lambda_function.lambda_handler
+      Runtime: python3.6
+      CodeUri: s3://lutencjusz-sam/00e351972e64e4df017465027eac5e2e
+      Description: ''
+      MemorySize: 128
+      Timeout: 3
+      Role:
+        Ref: RoleID
+      Events:
+        SQS1:
+          Type: SQS
+          Properties:
+            Queue:
+              Fn::GetAtt:
+              - SQSQueue2
+              - Arn
+            BatchSize: 10
+      Environment:
+        Variables:
+          STEPFUNCTION_ARN:
+            Fn::ImportValue: maszynaStanowa
+  SQSQueue2:
+    Type: AWS::SQS::Queue
+    Properties: {}
+  prognozapodlewaniapobierzDaneAirly:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: lambda_function.lambda_handler
+      Runtime: python3.6
+      CodeUri: s3://lutencjusz-sam/826fc645029d3ebba40aa935d8337ba3
+      Description: ''
+      MemorySize: 128
+      Timeout: 7
+      Role:
+        Ref: RoleID
+      Events:
+        Schedule1:
+          Type: Schedule
+          Properties:
+            Schedule: cron(1 0,3,6,9,12,15,18,21 * * ? *)
+      Environment:
+        Variables:
+          SQS_URL:
+            Ref: SQSQueue2
+          apikey:
+            Ref: apikeyAirly
+  prognozapodlewaniapobierzDaneWeatherbit:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: lambda_function.lambda_handler
+      Runtime: python3.6
+      CodeUri: s3://lutencjusz-sam/83d05c1009dcda2ccf14bc2e7b310a5f
+      Description: ''
+      MemorySize: 128
+      Timeout: 6
+      Role:
+        Ref: RoleID
+      Events:
+        Schedule1:
+          Type: Schedule
+          Properties:
+            Schedule: cron(1 0,3,6,9,12,15,18,21 * * ? *)
+      Environment:
+        Variables:
+          SQS_URL:
+            Ref: SQSQueue2
+          apikey:
+            Ref: apikeyWeatherbit
