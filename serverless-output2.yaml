@@ -8,6 +8,10 @@ Parameters:
     NoEcho: true
     Description: Apikey ICM
     Type: String
+  apikeyOpenWeather:
+    NoEcho: true
+    Description: Apikey ICM
+    Type: String
   apikeyAirly:
     NoEcho: true
     Description: Apikey Airly
@@ -17,6 +21,48 @@ Parameters:
     Description: Apikey Weatherbit
     Type: String
 Resources:
+  prognozapodlewaniapobierzAktualneDane:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs12.x
+      CodeUri: s3://lutencjusz-sam/fd81da317c5d43309caaa6c161a6739d
+      Description: ''
+      MemorySize: 128
+      Timeout: 3
+      Role: arn:aws:iam::790651879093:role/LambdaFullAccess
+      Environment:
+        Variables:
+          SQS_URL:
+            Ref: SQSQueue1
+      Events:
+        Schedule1:
+          Type: Schedule
+          Properties:
+            Schedule: cron(5 0,3,6,9,12,15,18,21 * * ? *)
+  prognozapodlewaniapobierzDanePython:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: lambda_function.lambda_handler
+      Runtime: python3.8
+      CodeUri: s3://lutencjusz-sam/5156f5f8c30e383522a8f9bc724ce706
+      Description: ''
+      MemorySize: 128
+      Timeout: 3
+      Role: arn:aws:iam::790651879093:role/LambdaFullAccess
+      Events:
+        Schedule1:
+          Type: Schedule
+          Properties:
+            Schedule: cron(6 0,6,12,18 * * ? *)
+      Environment:
+        Variables:
+          SQS_URL:
+            Ref: SQSQueue1
+          apikey:
+            Ref: apikeyOpenWeather
+          jednostka: C
+          max: '20'
   prognozapodlewaniaorkiestracjaZapisuSQL:
     Type: AWS::Serverless::Function
     Properties:
@@ -34,7 +80,7 @@ Resources:
           Properties:
             Queue:
               Fn::GetAtt:
-              - SQSQueue1
+              - SQSQueue2
               - Arn
             BatchSize: 10
       Environment:
@@ -58,7 +104,7 @@ Resources:
       Environment:
         Variables:
           SQS_URL:
-            Ref: SQSQueue1
+            Ref: SQSQueue2
           apikey:
             Ref: apikeyICM
   prognozapodlewaniapobierzDaneICM:
@@ -101,7 +147,7 @@ Resources:
           Properties:
             Queue:
               Fn::GetAtt:
-              - SQSQueue2
+              - SQSQueue1
               - Arn
             BatchSize: 10
       Environment:

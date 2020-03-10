@@ -25,3 +25,6 @@ sam deploy \
    --parameter-overrides $(cat secret.env) \
    --region us-east-1 \
    --s3-bucket lutencjusz-sam
+
+mysql -h db-test.us-east-1.rds.amazonaws.com -u admin -p < create_database.sql
+mysql -h db-test.us-east-1.rds.amazonaws.com -u admin -p DBPrognozaPodlewania < create_db.sql 

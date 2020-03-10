@@ -45,7 +45,7 @@ Resources:
     Properties:
       Handler: lambda_function.lambda_handler
       Runtime: python3.8
-      CodeUri: .
+      CodeUri: functions/prognoza-podlewania-pobierzDanePython.zip
       Description: ''
       MemorySize: 128
       Timeout: 3
