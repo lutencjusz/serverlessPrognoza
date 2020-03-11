@@ -426,5 +426,6 @@ Outputs:
       Name: maszynaStanowa
   rdsHost:
     Description: Zmienna rds_host z bazy danych
-    Value:
-      !GetAtt PrognozaPodlewaniaDB.Endpoint.Address
+    Value: !GetAtt PrognozaPodlewaniaDB.Endpoint.Address
+    Export:
+      Name: rdsHost
