@@ -26,6 +26,6 @@ Successfully created/updated stack - PROGNOZA3 in us-east-1
 
 Enter password:
 ```
-wprowadź hasło dla użytkonika bazy danych: admin
+wprowadź **2 razy** hasło użytkonika bazy danych: admin
 
 To wszystko... System zacznie automatycznie gromadzić dane z wybranych serwisów, które będą dostępne za pomocą fron-end systemu czasu rzeczywistego np. Grafana. 
