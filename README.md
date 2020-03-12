@@ -5,13 +5,13 @@ The Forecast system is used to compare the accuracy and deviation of weather for
 
 **Attention: The data contained in the file is confidential**
 ```
- ParameterKey=RoleID,ParameterValue=<Rola umo zliwiająca funkcją Lambda dostęp do zasobów>
- ParameterKey=apikeyWeatherbit,ParameterValue=<klucz z Weatherbit>
- ParameterKey=apikeyICM,ParameterValue=<klucz z ICM>
- ParameterKey=apikeyAirly,ParameterValue=<klucz z Airly>
- ParameterKey=apikeyOpenWeather,ParameterValue=<klucz z OpenWeather>
- ParameterKey=dbUsername,ParameterValue=<konto admina bazy danych>
- ParameterKey=dbPassword,ParameterValue=<hasło admina>
+ ParameterKey=RoleID,ParameterValue=<Role that enables Lambda functions access resources>
+ ParameterKey=apikeyWeatherbit,ParameterValue=<Weatherbit's key>
+ ParameterKey=apikeyICM,ParameterValue=<ICM's key>
+ ParameterKey=apikeyAirly,ParameterValue=<Airly's key>
+ ParameterKey=apikeyOpenWeather,ParameterValue=<OpenWeather's key>
+ ParameterKey=dbUsername,ParameterValue=<admin account for database>
+ ParameterKey=dbPassword,ParameterValue=<admin password>
 ```
 1. Once, from the root directory, invoke the command:
 ```shell
