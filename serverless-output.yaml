@@ -1,0 +1,383 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Parameters:
+  dbUsername:
+    Description: Name of superuser of database
+    Type: String
+  RoleID:
+    Description: Name of superuser of database
+    Type: String
+  apikeyWeatherbit:
+    NoEcho: true
+    Description: Apikey Weatherbit
+    Type: String
+  apikeyAirly:
+    NoEcho: true
+    Description: Apikey Airly
+    Type: String
+  apikeyICM:
+    NoEcho: true
+    Description: Apikey ICM
+    Type: String
+  dbPassword:
+    NoEcho: true
+    Description: Podaj haslo dla !Ref dbUsernamea bazy danych
+    Type: String
+  EnvironmentName:
+    Description: "Rodzaj \u015Brodowiska"
+    Type: String
+    AllowedValues:
+    - DEV
+    - PROD
+    Default: DEV
+    ConstraintDescription: "Musi by\u0107 DEV lub PROD"
+Resources:
+  PrognozaPodlewaniaDB:
+    Type: AWS::RDS::DBInstance
+    Properties:
+      DBInstanceIdentifier: db-test
+      DBName: DBPrognozaPodlewania
+      DBInstanceClass: db.t2.micro
+      AllocatedStorage: 20
+      Engine: MySQL
+      EngineVersion: 8.0.16
+      MasterUsername:
+        Ref: dbUsername
+      MasterUserPassword:
+        Ref: dbPassword
+      MonitoringInterval: '60'
+      MonitoringRoleArn: arn:aws:iam::790651879093:role/rds-monitoring-role
+  prognozapogodypobierzDaneWeatherbitDoPrognozy:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: lambda_function.lambda_handler
+      Runtime: python3.8
+      CodeUri: s3://lutencjusz-sam/5ab74ef068877b989d598ea32c777a6d
+      Description: ''
+      MemorySize: 128
+      Timeout: 3
+      Role: arn:aws:iam::790651879093:role/LambdaFullAccess
+      Environment:
+        Variables:
+          db_name: DBPrognozaPodlewania
+          db_username:
+            Ref: dbUsername
+          password:
+            Ref: dbPassword
+          rds_host:
+            Fn::GetAtt:
+            - PrognozaPodlewaniaDB
+            - Endpoint.Address
+  prognozapodlewaniaczyPrognozaPrawidlowa:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: lambda_function.lambda_handler
+      Runtime: python3.8
+      CodeUri: s3://lutencjusz-sam/abe2f8a66b887328f11df6e0e9205a46
+      Description: ''
+      MemorySize: 128
+      Timeout: 3
+      Role: arn:aws:iam::790651879093:role/LambdaFullAccess
+      Environment:
+        Variables:
+          db_name: DBPrognozaPodlewania
+          db_username:
+            Ref: dbUsername
+          password:
+            Ref: dbPassword
+          rds_host:
+            Fn::GetAtt:
+            - PrognozaPodlewaniaDB
+            - Endpoint.Address
+  prognozapodlewaniaczyTemperatura:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: lambda_function.lambda_handler
+      Runtime: python3.6
+      CodeUri: s3://lutencjusz-sam/b8d14b44c5663c0c0ac2d97037e5c26a
+      Description: ''
+      MemorySize: 128
+      Timeout: 3
+      Role:
+        Ref: RoleID
+      Environment:
+        Variables:
+          jednostka: C
+          max: '30'
+          min: '10'
+          rodzajTemp: naturalna
+  prognozapodlewaniadynamoDBTOMySQL:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: lambda_function.lambda_handler
+      Runtime: python3.6
+      CodeUri: s3://lutencjusz-sam/574c8f0437abb6f3bbfdca21c386fa83
+      Description: ''
+      MemorySize: 128
+      Timeout: 16
+      Role:
+        Ref: RoleID
+      Environment:
+        Variables:
+          DYNAMODB_NAME: prognoza-podlewaniaDB
+          db_name: DBPrognozaPodlewania
+          db_username:
+            Ref: dbUsername
+          password:
+            Ref: dbPassword
+          rds_host:
+            Fn::GetAtt:
+            - PrognozaPodlewaniaDB
+            - Endpoint.Address
+  prognozapodlewaniaobslugaDatyCzasu:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: lambda_function.lambda_handler
+      Runtime: python3.6
+      CodeUri: s3://lutencjusz-sam/d0612c1815835a5ee354acf7367c3339
+      Description: ''
+      MemorySize: 128
+      Timeout: 8
+      Role:
+        Ref: RoleID
+  prognozapodlewaniapobierzICMdoPrognozy:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: lambda_function.lambda_handler
+      Runtime: python3.6
+      CodeUri: s3://lutencjusz-sam/2334066c86f89a3563a1b72fefe81d4f
+      Description: ''
+      MemorySize: 128
+      Timeout: 6
+      Role:
+        Ref: RoleID
+      Environment:
+        Variables:
+          db_name: DBPrognozaPodlewania
+          db_table: pognozaICM
+          db_username:
+            Ref: dbUsername
+          password:
+            Ref: dbPassword
+          rds_host:
+            Fn::GetAtt:
+            - PrognozaPodlewaniaDB
+            - Endpoint.Address
+  prognozapodlewaniaPOSTMySQL:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: lambda_function.lambda_handler
+      Runtime: python3.6
+      CodeUri: s3://lutencjusz-sam/00a22ed332a79be0a54d5504a2f92e97
+      Description: ''
+      MemorySize: 128
+      Timeout: 8
+      Role:
+        Ref: RoleID
+      Environment:
+        Variables:
+          db_endpoint:
+            Fn::GetAtt:
+            - PrognozaPodlewaniaDB
+            - Endpoint.Address
+          db_name: DBPrognozaPodlewania
+          db_username:
+            Ref: dbUsername
+          password:
+            Ref: dbPassword
+          rds_host:
+            Fn::GetAtt:
+            - PrognozaPodlewaniaDB
+            - Endpoint.Address
+  prognozapodlewaniatlumaczenieNaPL:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: lambda_function.lambda_handler
+      Runtime: python3.6
+      CodeUri: s3://lutencjusz-sam/4f73df9a006c0b2551fce168ea53c6ec
+      Description: ''
+      MemorySize: 128
+      Timeout: 6
+      Role:
+        Ref: RoleID
+  prognozapodlewaniazapisDoBazy:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: lambda_function.lambda_handler
+      Runtime: python3.6
+      CodeUri: s3://lutencjusz-sam/512ef6c3dc3317609b45af29f1cd7e64
+      Description: ''
+      MemorySize: 128
+      Timeout: 8
+      Role:
+        Ref: RoleID
+      Environment:
+        Variables:
+          DB_NAME: DBPrognozaPodlewania
+  prognozapogodyczyWilgotnosc:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: lambda_function.lambda_handler
+      Runtime: python3.6
+      CodeUri: s3://lutencjusz-sam/0ddaed6218f8060f8e40e4dc6bba5c6f
+      Description: ''
+      MemorySize: 128
+      Timeout: 8
+      Role:
+        Ref: RoleID
+      Environment:
+        Variables:
+          max: '60'
+          min: '0'
+          minZachmurzenie: '40'
+          opt: '45'
+  prognozapogodypobierzArlyDoPrognozy:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: lambda_function.lambda_handler
+      Runtime: python3.6
+      CodeUri: s3://lutencjusz-sam/b0f1b3615659aae3e71292d3fd5aef12
+      Description: ''
+      MemorySize: 128
+      Timeout: 8
+      Role:
+        Ref: RoleID
+      Environment:
+        Variables:
+          db_name: DBPrognozaPodlewania
+          db_username:
+            Ref: dbUsername
+          password:
+            Ref: dbPassword
+          rds_host:
+            Fn::GetAtt:
+            - PrognozaPodlewaniaDB
+            - Endpoint.Address
+  prognozapodlewaniaUPDATEMySQL:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: lambda_function.lambda_handler
+      Runtime: python3.8
+      CodeUri: s3://lutencjusz-sam/8913e931fa06964906e1d7fd709bdaf2
+      Description: ''
+      MemorySize: 128
+      Timeout: 6
+      Role:
+        Ref: RoleID
+      Environment:
+        Variables:
+          password:
+            Ref: dbPassword
+          db_name: DBPrognozaPodlewania
+          db_username:
+            Ref: dbUsername
+          rds_host:
+            Fn::GetAtt:
+            - PrognozaPodlewaniaDB
+            - Endpoint.Address
+          field_update: cZP_temp_odcz, cZP_temp
+  maszynaStanowaZapiszDoBazy:
+    Type: AWS::StepFunctions::StateMachine
+    Properties:
+      StateMachineName: Prognoza-podlewania-zapisDoBaz
+      StateMachineType: STANDARD
+      DefinitionString:
+        Fn::Sub: "{\n  \"Comment\": \"A Hello World example of the Amazon States Language\
+          \ using Pass states\",\n  \"StartAt\": \"Hello\",\n  \"States\": {\n   \
+          \ \"Hello\": {\n      \"Type\": \"Pass\",\n      \"Next\": \"ObslugaDatyCzasu\"\
+          \n    },\n    \"ObslugaDatyCzasu\": {\n      \"Type\": \"Task\",\n     \
+          \ \"Resource\": \"${prognozapodlewaniaobslugaDatyCzasu.Arn}\",\n      \"\
+          Next\": \"ZapisDoSQL\"\n    },\n    \"ZapisDoSQL\": {\n      \"Type\": \"\
+          Task\",\n      \"TimeoutSeconds\": 3,\n      \"HeartbeatSeconds\": 3,\n\
+          \      \"Resource\": \"${prognozapodlewaniaPOSTMySQL.Arn}\",\n      \"Catch\"\
+          : [\n        {\n          \"ErrorEquals\": [\"Blad\"],\n          \"Next\"\
+          : \"Blad\"\n        }],\n      \"End\": true\n    },\n    \"Blad\":{\n \
+          \     \"Type\": \"Fail\",\n      \"Cause\":\"Nie udalo sie zapisac do bazy!\"\
+          ,\n      \"Error\": \"Error\"\n    }\n  }\n}"
+      RoleArn: arn:aws:iam::790651879093:role/service-role/StepFunctions-MojaMaszynaStanowa-role-c3a6af5b
+  maszynaStanowaUpdateDoBazy:
+    Type: AWS::StepFunctions::StateMachine
+    Properties:
+      StateMachineName: Prognoza-podlewania-updateDoBaz
+      StateMachineType: STANDARD
+      DefinitionString:
+        Fn::Sub: "{\n  \"Comment\": \"A Hello World example of the Amazon States Language\
+          \ using Pass states\",\n  \"StartAt\": \"CzyPrognozaPrawidlowa\",\n  \"\
+          States\": {\n    \"CzyPrognozaPrawidlowa\": {\n      \"Type\": \"Task\"\
+          ,\n      \"Resource\": \"${prognozapodlewaniaczyPrognozaPrawidlowa.Arn}\"\
+          ,\n      \"Next\": \"UpdateDoSQL\"\n    },\n    \"UpdateDoSQL\": {\n   \
+          \   \"Type\": \"Task\",\n      \"TimeoutSeconds\": 10,\n      \"HeartbeatSeconds\"\
+          : 10,\n      \"Resource\": \"${prognozapodlewaniaUPDATEMySQL.Arn}\",\n \
+          \     \"Catch\": [ \n        {\n          \"ErrorEquals\": [\"Blad\"],\n\
+          \          \"Next\": \"Blad\"\n        }],\n      \"End\": true\n    },\n\
+          \    \"Blad\":{\n      \"Type\": \"Fail\",\n      \"Cause\":\"Nie udalo\
+          \ sie zapisac do bazy!\",\n      \"Error\": \"Error\"\n    }\n  }\n}"
+      RoleArn: arn:aws:iam::790651879093:role/service-role/StepFunctions-MojaMaszynaStanowa-role-c3a6af5b
+  maszynaStanowa:
+    Type: AWS::StepFunctions::StateMachine
+    Properties:
+      StateMachineName: Prognoza-podlewania-maszynaStanowa
+      StateMachineType: STANDARD
+      DefinitionString:
+        Fn::Sub: "{\n  \"Comment\": \"Prognoza podlewania ma na celu sprawdzenie,\
+          \ czy nalezy podlewac kwiaty na balkonie\",\n  \"StartAt\": \"czyTemperatura\"\
+          ,\n  \"States\": {\n    \"czyTemperatura\": {\n      \"Type\": \"Task\"\
+          ,\n      \"Resource\": \"${prognozapodlewaniaczyTemperatura.Arn}\",\n  \
+          \    \"Next\": \"czyWilgotnosc\"\n    },\n    \"czyWilgotnosc\": {\n   \
+          \   \"Type\": \"Task\",\n      \"Resource\": \"${prognozapogodyczyWilgotnosc.Arn}\"\
+          ,\n      \"Next\": \"Obs\u0142ugaParametrow\"\n    },\n    \"Obs\u0142ugaParametrow\"\
+          : {\n      \"Type\": \"Task\",\n      \"Resource\": \"${prognozapodlewaniaobslugaDatyCzasu.Arn}\"\
+          ,\n      \"Next\": \"pobierzZICM\"\n    },\n    \"pobierzZICM\": {\n   \
+          \   \"Type\": \"Task\",\n      \"Resource\": \"${prognozapodlewaniapobierzICMdoPrognozy.Arn}\"\
+          ,\n      \"Next\": \"pobierzZAirly\"\n    },\n    \"pobierzZAirly\": {\n\
+          \      \"Type\": \"Task\",\n      \"Resource\": \"${prognozapogodypobierzArlyDoPrognozy.Arn}\"\
+          ,\n      \"Next\": \"pobierzZWeatherbit\"\n    },\n    \"pobierzZWeatherbit\"\
+          : {\n      \"Type\": \"Task\",\n      \"Resource\": \"${prognozapogodypobierzDaneWeatherbitDoPrognozy.Arn}\"\
+          ,\n      \"Next\": \"CzyPrognozaPrawidlowa\"\n    },\n    \"CzyPrognozaPrawidlowa\"\
+          : {\n      \"Type\": \"Task\",\n      \"Resource\": \"${prognozapodlewaniaczyPrognozaPrawidlowa.Arn}\"\
+          ,\n      \"Next\": \"tlumaczenieOpisu\"\n    },\n    \"tlumaczenieOpisu\"\
+          : {\n      \"Type\": \"Task\",\n      \"Resource\": \"${prognozapodlewaniatlumaczenieNaPL.Arn}\"\
+          ,\n      \"Next\": \"Parallel\"\n    },\n    \"Parallel\": {\n      \"Type\"\
+          : \"Parallel\",\n      \"End\": true,\n      \"Branches\": [\n        {\n\
+          \          \"StartAt\": \"ZapisDoBazyDynamoDB\",\n          \"States\":\
+          \ {\n            \"ZapisDoBazyDynamoDB\": {\n              \"Type\": \"\
+          Task\",\n              \"Resource\": \"${prognozapodlewaniazapisDoBazy.Arn}\"\
+          ,\n              \"End\": true\n            }\n          }\n        },\n\
+          \        {\n          \"StartAt\": \"ZapisDoBazyMySQL\",\n          \"States\"\
+          : {\n            \"ZapisDoBazyMySQL\": {\n              \"Type\": \"Task\"\
+          ,\n              \"TimeoutSeconds\": 3,\n              \"HeartbeatSeconds\"\
+          : 3,\n              \"Resource\": \"${prognozapodlewaniaPOSTMySQL.Arn}\"\
+          ,\n              \"Catch\": [\n                {\n                  \"ErrorEquals\"\
+          : [\"Blad\"],\n                  \"Next\": \"Blad\"\n                }],\n\
+          \              \"End\": true\n            },\n            \"Blad\":{\n \
+          \             \"Type\": \"Fail\",\n              \"Cause\":\"Nie udalo sie\
+          \ zapisac do bazy!\",\n              \"Error\": \"Error\"\n            }\n\
+          \          }\n        }\n      ]\n    }\n  }\n}"
+      RoleArn: arn:aws:iam::790651879093:role/service-role/StepFunctions-MojaMaszynaStanowa-role-c3a6af5b
+Outputs:
+  maszynaStanowaZapiszDoBazy:
+    Description: Zmienna ARN dla Step Function
+    Value:
+      Ref: maszynaStanowaZapiszDoBazy
+    Export:
+      Name: maszynaStanowaZapiszDoBazyZmienna
+  maszynaStanowaUpdateDoBazy:
+    Description: Zmienna ARN dla Step Function
+    Value:
+      Ref: maszynaStanowaUpdateDoBazy
+    Export:
+      Name: maszynaStanowaUpdateDoBazyZmienna
+  maszynaStanowa:
+    Description: Zmienna ARN dla Step Function
+    Value:
+      Ref: maszynaStanowa
+    Export:
+      Name: maszynaStanowaZmienna
+  PrognozaPodlewaniaDB:
+    Description: Zmienna rds_host z bazy danych
+    Value:
+      Fn::GetAtt:
+      - PrognozaPodlewaniaDB
+      - Endpoint.Address
+    Export:
+      Name: rdsHostZmienna
