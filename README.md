@@ -13,11 +13,11 @@ The Forecast system is used to compare the accuracy and deviation of weather for
  ParameterKey=dbUsername,ParameterValue=<konto admina bazy danych>
  ParameterKey=dbPassword,ParameterValue=<hasło admina>
 ```
-1. Since the root directory, invoke the command:
+1. Once, from the root directory, invoke the command:
 ```shell
 ./init.sh
 ```
-2. When a message appears, ask for password of admin user:
+2. When a message *Enter password* appears, write admin password:
 ```
 CREATE_COMPLETE                                           AWS::Lambda::EventSourceMapping                           prognozapodlewaniaorkiestracjaUpdateSQLSQSUpdate          -                                                       
 CREATE_COMPLETE                                           AWS::CloudFormation::Stack                                PROGNOZA3                                                 -                                                       
