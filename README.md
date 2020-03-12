@@ -1,7 +1,7 @@
  # Instalation of Forecast on Linux [->PL](./READMEpl.md)
 The Forecast system is used to compare the accuracy and deviation of weather forecasts. For this purpose, data from OpenWeather, Weatherbit, Airly and ICM services are saved to *AWS RDS MySQL* using the *AWS Lambda* functions and *AWS SQS*. Sampling frequency is determined by *CloudWatch Events*.
 
-1. In *root* catalog  ** secret.env ** file should be created in the directory, which should consist of individual parameters.
+1. In *root* catalog  ```secret.env``` file should be created in the directory, which should consist of individual parameters.
 
 **Attention: The data contained in the file is confidential**
 ```
