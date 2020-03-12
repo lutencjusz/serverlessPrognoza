@@ -38,7 +38,7 @@ Resources:
             BatchSize: 10
       Environment:
         Variables:
-          STEPFUNCTION_ARN: !ImportValue maszynaStanowaUpdateDoBazy
+          STEPFUNCTION_ARN: !ImportValue maszynaStanowaZapiszDoBazyZmienna
   prognozapodlewaniapobierzWszystkieSQL:
     Type: 'AWS::Serverless::Function'
     Properties:
@@ -58,4 +58,4 @@ Resources:
           fields: 'id,temp,temp_odcz,waga,data'
           limit: '100'
           password: !Ref dbPassword
-          rds_host: !ImportValue rdsHost
+          rds_host: !ImportValue rdsHostZmienna

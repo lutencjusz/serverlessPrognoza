@@ -1,14 +1,31 @@
-         ___        ______     ____ _                 _  ___  
-        / \ \      / / ___|   / ___| | ___  _   _  __| |/ _ \ 
-       / _ \ \ /\ / /\___ \  | |   | |/ _ \| | | |/ _` | (_) |
-      / ___ \ V  V /  ___) | | |___| | (_) | |_| | (_| |\__, |
-     /_/   \_\_/\_/  |____/   \____|_|\___/ \__,_|\__,_|  /_/ 
- ----------------------------------------------------------------- 
+# Instalacja systemu na Linuxie
 
+1. W katalogu głównym należy utworzyć plik **secret.env**, który powinien się składać z następujących parametrów.
 
-Hi there! Welcome to AWS Cloud9!
+**Uwaga: Dane znajdujące się w pliku są poufne**
+```
+ ParameterKey=RoleID,ParameterValue=<Rola umo zliwiająca funkcją Lambda dostęp do zasobów>
+ ParameterKey=apikeyWeatherbit,ParameterValue=<klucz z Weatherbit>
+ ParameterKey=apikeyICM,ParameterValue=<klucz z ICM>
+ ParameterKey=apikeyAirly,ParameterValue=<klucz z Airly>
+ ParameterKey=apikeyOpenWeather,ParameterValue=<klucz z OpenWeather>
+ ParameterKey=dbUsername,ParameterValue=<konto admina bazy danych>
+ ParameterKey=dbPassword,ParameterValue=<hasło admina>
+```
+1. Będąc w katalogu głównym uruchom polecenie:
+```shell
+./init.sh
+```
+2. Po pojawieniu się komunikatu z prośbą o poadanie hasła
+```
+CREATE_COMPLETE                                           AWS::Lambda::EventSourceMapping                           prognozapodlewaniaorkiestracjaUpdateSQLSQSUpdate          -                                                       
+CREATE_COMPLETE                                           AWS::CloudFormation::Stack                                PROGNOZA3                                                 -                                                       
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-To get started, create some files, play with the terminal,
-or visit https://docs.aws.amazon.com/console/cloud9/ for our documentation.
+Successfully created/updated stack - PROGNOZA3 in us-east-1
 
-Happy coding!
+Enter password:
+```
+wprowadź hasło dla użytkonika bazy danych: admin
+
+To wszystko... System zacznie automatycznie gromadzić dane z wybranych serwisów, które będą dostępne za pomocą fron-end systemu czasu rzeczywistego np. Grafana. 

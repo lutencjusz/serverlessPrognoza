@@ -408,24 +408,25 @@ Resources:
 Outputs:
   maszynaStanowaZapiszDoBazy:
     Description: Zmienna ARN dla Step Function
-    Value:
+    Value: 
       Ref: maszynaStanowaZapiszDoBazy
     Export:
-      Name: maszynaStanowaZapiszDoBazy
+      Name: maszynaStanowaZapiszDoBazyZmienna
   maszynaStanowaUpdateDoBazy:
     Description: Zmienna ARN dla Step Function
-    Value:
+    Value: 
       Ref: maszynaStanowaUpdateDoBazy
     Export:
-      Name: maszynaStanowaUpdateDoBazy
+      Name: maszynaStanowaUpdateDoBazyZmienna
   maszynaStanowa:
     Description: Zmienna ARN dla Step Function
-    Value:
+    Value: 
       Ref: maszynaStanowa
     Export:
-      Name: maszynaStanowa
-  rdsHost:
+      Name: maszynaStanowaZmienna
+  PrognozaPodlewaniaDB:
     Description: Zmienna rds_host z bazy danych
-    Value: !GetAtt PrognozaPodlewaniaDB.Endpoint.Address
+    Value:
+      "Fn::GetAtt": [PrognozaPodlewaniaDB, Endpoint.Address]
     Export:
-      Name: rdsHost
+      Name: rdsHostZmienna

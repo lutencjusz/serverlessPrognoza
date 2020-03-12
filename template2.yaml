@@ -82,7 +82,7 @@ Resources:
             BatchSize: 10
       Environment:
         Variables:
-          STEPFUNCTION_ARN: !ImportValue maszynaStanowaZapiszDoBazy
+          STEPFUNCTION_ARN: !ImportValue maszynaStanowaUpdateDoBazyZmienna
   SQSQueue1:
     Type: 'AWS::SQS::Queue'
     Properties: {}
@@ -141,7 +141,7 @@ Resources:
             BatchSize: 10
       Environment:
         Variables:
-          STEPFUNCTION_ARN: !ImportValue maszynaStanowa
+          STEPFUNCTION_ARN: !ImportValue maszynaStanowaZmienna
   SQSQueue2:
     Type: 'AWS::SQS::Queue'
     Properties: {}
