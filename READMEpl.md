@@ -1,9 +1,9 @@
- # Instalation of Forecast on Linux [PL](./READMEpl.md)
-The Forecast system is used to compare the accuracy and deviation of weather forecasts. For this purpose, data from OpenWeather, Weatherbit, Airly and ICM services are saved to * AWS RDS MySQL * using the * AWS Lambda * functions and * AWS SQS *. Sampling frequency is determined by * CloudWatch Events *.
+# Instalacja systemu Prognoza na Linuxie [EN](./README.md)
+System Prognoza służy do porównania trafności oraz odchylenia prognoz serwisów pogodowych. W tym celu dane z serwisów OpenWeather, Weatherbit, Airly oraz ICM zapisywanie są do *AWS RDS MySQL* za pomocą funkcji *AWS Lambda* oraz *AWS SQS*. Częstotliwość pobierania próbek określana jest za pomocą *CloudWatch Events*. 
 
-1. In *root* catalog  ** secret.env ** file should be created in the directory, which should consist of individual parameters.
+1. W katalogu głównym należy utworzyć plik **secret.env**, który powinien się składać z następujących parametrów.
 
-**Attention: The data contained in the file is confidential**
+**Uwaga: Dane znajdujące się w pliku są poufne**
 ```
  ParameterKey=RoleID,ParameterValue=<Rola umo zliwiająca funkcją Lambda dostęp do zasobów>
  ParameterKey=apikeyWeatherbit,ParameterValue=<klucz z Weatherbit>
@@ -13,11 +13,11 @@ The Forecast system is used to compare the accuracy and deviation of weather for
  ParameterKey=dbUsername,ParameterValue=<konto admina bazy danych>
  ParameterKey=dbPassword,ParameterValue=<hasło admina>
 ```
-1. Since the root directory, invoke the command:
+1. Będąc w katalogu głównym uruchom polecenie:
 ```shell
 ./init.sh
 ```
-2. When a message appears, ask for password of admin user:
+2. Po pojawieniu się komunikatu z prośbą o poadanie hasła
 ```
 CREATE_COMPLETE                                           AWS::Lambda::EventSourceMapping                           prognozapodlewaniaorkiestracjaUpdateSQLSQSUpdate          -                                                       
 CREATE_COMPLETE                                           AWS::CloudFormation::Stack                                PROGNOZA3                                                 -                                                       
@@ -27,5 +27,6 @@ Successfully created/updated stack - PROGNOZA3 in us-east-1
 
 Enter password:
 ```
+wprowadź hasło dla użytkonika bazy danych: admin
 
-That's all ... The system automatically should start collect data from selected services that will be available via the front-end real-time system, e.g. Grafana.
+To wszystko... System zacznie automatycznie gromadzić dane z wybranych serwisów, które będą dostępne za pomocą fron-end systemu czasu rzeczywistego np. Grafana. 
