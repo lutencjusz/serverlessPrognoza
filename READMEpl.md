@@ -1,4 +1,4 @@
-# Instalacja systemu Prognoza na Linuxie [EN](./README.md)
+# Instalacja systemu Prognoza na Linuxie [->EN](./README.md)
 System Prognoza służy do porównania trafności oraz odchylenia prognoz serwisów pogodowych. W tym celu dane z serwisów OpenWeather, Weatherbit, Airly oraz ICM zapisywanie są do *AWS RDS MySQL* za pomocą funkcji *AWS Lambda* oraz *AWS SQS*. Częstotliwość pobierania próbek określana jest za pomocą *CloudWatch Events*. 
 
 1. W katalogu głównym należy utworzyć plik **secret.env**, który powinien się składać z następujących parametrów.
